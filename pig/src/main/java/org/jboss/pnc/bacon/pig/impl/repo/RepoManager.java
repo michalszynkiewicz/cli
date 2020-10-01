@@ -232,6 +232,8 @@ public class RepoManager extends DeliverableManager<RepoGenerationData, Reposito
 
         ParentPomDownloader.addParentPoms(targetRepoContentsDir.toPath());
 
+        Collection<GAV> fullGavList = RepoDescriptor.listGavs(targetRepoContentsDir);
+
         RepositoryUtils.removeCommunityArtifacts(targetRepoContentsDir);
         RepositoryUtils.removeIrrelevantFiles(targetRepoContentsDir);
 
@@ -243,7 +245,7 @@ public class RepoManager extends DeliverableManager<RepoGenerationData, Reposito
         }
         zip(targetTopLevelDirectory, targetZipPath);
 
-        return result(targetTopLevelDirectory, targetZipPath);
+        return result(targetTopLevelDirectory, fullGavList, targetZipPath);
     }
 
     private void addMissingSources() {
@@ -340,11 +342,14 @@ public class RepoManager extends DeliverableManager<RepoGenerationData, Reposito
         return pigConfiguration.getTopLevelDirectoryPrefix() + "maven-repository";
     }
 
-    private RepositoryData result(File targetTopLevelDirectory, Path targetZipPath) {
+    private RepositoryData result(File targetTopLevelDirectory,
+                                  Collection<GAV> fullGavList,
+                                  Path targetZipPath) {
         RepositoryData result = new RepositoryData();
         File contentsDirectory = new File(targetTopLevelDirectory, "maven-repository");
         result.setFiles(RepoDescriptor.listFiles(contentsDirectory));
         result.setGavs(RepoDescriptor.listGavs(contentsDirectory));
+        result.setFullGavList(fullGavList);
         result.setRepositoryPath(targetZipPath);
         log.info("created repository: {}", targetZipPath);
         return result;

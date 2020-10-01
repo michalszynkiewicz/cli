@@ -272,7 +272,7 @@ public class BuildConfig {
                 throw new FatalException("Exception while talking to PNC", e);
             }
         } else {
-            throw new FatalException("No environmentId / environmentSystemImageId defined for the build config");
+            throw new FatalException("No environmentId / environmentSystemImageId defined for build config {}", getName());
         }
     }
 }

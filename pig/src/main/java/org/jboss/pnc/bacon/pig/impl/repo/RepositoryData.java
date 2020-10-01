@@ -31,6 +31,10 @@ import java.util.Collection;
 @Data
 public class RepositoryData {
     private Collection<GAV> gavs;
+    /**
+     * Unfiltered list of all artifacts that were a base for repository generation, including community artifacts
+     */
+    private Collection<GAV> fullGavList;
     private Collection<File> files;
     private Path repositoryPath;
 }
