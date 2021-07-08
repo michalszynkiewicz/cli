@@ -93,7 +93,7 @@ public class RepoManager extends DeliverableManager<RepoGenerationData, Reposito
         this.configurationDirectory = configurationDirectory;
         this.strictLicenseCheck = strictLicenseCheck;
         buildInfoCollector = new BuildInfoCollector();
-//        isTestMode = false;
+        // isTestMode = false;
     }
 
     public RepoManager(
@@ -111,7 +111,7 @@ public class RepoManager extends DeliverableManager<RepoGenerationData, Reposito
         this.configurationDirectory = configurationDirectory;
         this.strictLicenseCheck = strictLicenseCheck;
         this.buildInfoCollector = buildInfoCollector;
-//        this.isTestMode = isTestMode;
+        // this.isTestMode = isTestMode;
     }
 
     public RepositoryData prepare() {
@@ -277,10 +277,10 @@ public class RepoManager extends DeliverableManager<RepoGenerationData, Reposito
 
         ParentPomDownloader.addParentPoms(targetRepoContentsDir.toPath());
 
-//        if (!isTestMode) {
-            RepositoryUtils.removeCommunityArtifacts(targetRepoContentsDir);
-            RepositoryUtils.removeIrrelevantFiles(targetRepoContentsDir);
-//        }
+        // if (!isTestMode) {
+        RepositoryUtils.removeCommunityArtifacts(targetRepoContentsDir);
+        RepositoryUtils.removeIrrelevantFiles(targetRepoContentsDir);
+        // }
         addMissingSources();
 
         RepositoryUtils.addCheckSums(targetRepoContentsDir);

@@ -43,14 +43,28 @@ public class ResolveOnlyRepositoryTest {
 
     @Test
     void resolveAndRepackageShouldGenerateRepository() {
-
+/*        wireMockServer.addMockServiceRequestListener((request, response) -> {
+            System.out.printf(
+                    "-> [%s] %s: %s\n",
+                    request.getMethod(),
+                    request.getAbsoluteUrl(),
+                    request.getBodyAsString());
+            System.out.printf(
+                    "<- [%s] --- \n%s\n%s\n",
+                    response.getStatus(),
+                    response.getBodyAsString(),
+                    response.getHeaders());
+        });*/
         wireMockServer.start();
         stubFor(
-            get(urlEqualTo("/org/jboss/jboss-parent/37/jboss-parent-37.pom"))
-                .willReturn(aResponse().withBodyFile("sample.pom")));
+                get(urlEqualTo("/org/jboss/jboss-parent/37/jboss-parent-37.pom"))
+                        .willReturn(aResponse().withBodyFile("sample.pom")));
         stubFor(
-            get(urlMatching("/io/vertx/vertx-bridge-common/4.1.0/vertx-bridge-common-4.1.0.jar"))
-                .willReturn(aResponse().withBodyFile("sample.jar")));
+                get(urlMatching("/io/vertx/vertx-bridge-common/4.1.0/vertx-bridge-common-4.1.0.jar"))
+                        .willReturn(aResponse().withBodyFile("sample.jar")));
+        stubFor(
+                get(urlMatching("/io/vertx/vertx-bridge-common/4.1.0/vertx-bridge-common-4.1.0.pom"))
+                        .willReturn(aResponse().withBodyFile("sample.pom")));
         mockPigContextAndMethods();
         mockIndySettingsFile();
 
@@ -114,7 +128,8 @@ public class ResolveOnlyRepositoryTest {
     private void mockIndySettingsFile() {
         String pathToTestSettingsFile = ResourceUtils.extractToTmpFile("/indy-settings.xml", "settings", ".xml")
                 .getAbsolutePath();
-        FileUtils.replaceFileString("https://repo1.maven.org/maven2/","http://localhost:8080/",pathToTestSettingsFile);
+        FileUtils
+                .replaceFileString("https://repo1.maven.org/maven2/", "http://localhost:8080/", pathToTestSettingsFile);
         MockedStatic<Indy> indyMockedStatic = Mockito.mockStatic(Indy.class);
         indyMockedStatic.when(() -> Indy.getConfiguredIndySettingsXmlPath(false)).thenReturn(pathToTestSettingsFile);
     }
