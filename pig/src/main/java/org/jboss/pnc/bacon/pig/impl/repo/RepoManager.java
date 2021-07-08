@@ -78,7 +78,6 @@ public class RepoManager extends DeliverableManager<RepoGenerationData, Reposito
     private final boolean removeGeneratedM2Dups;
     private final Path configurationDirectory;
     private final boolean strictLicenseCheck;
-    private final boolean isTestMode;
 
     public RepoManager(
             PigConfiguration pigConfiguration,
@@ -94,7 +93,7 @@ public class RepoManager extends DeliverableManager<RepoGenerationData, Reposito
         this.configurationDirectory = configurationDirectory;
         this.strictLicenseCheck = strictLicenseCheck;
         buildInfoCollector = new BuildInfoCollector();
-        isTestMode = false;
+//        isTestMode = false;
     }
 
     public RepoManager(
@@ -105,15 +104,14 @@ public class RepoManager extends DeliverableManager<RepoGenerationData, Reposito
             Path configurationDirectory,
             boolean removeGeneratedM2Dups,
             boolean strictLicenseCheck,
-            BuildInfoCollector buildInfoCollector,
-            Boolean isTestMode) {
+            BuildInfoCollector buildInfoCollector) {
         super(pigConfiguration, releasePath, deliverables, builds);
         generationData = pigConfiguration.getFlow().getRepositoryGeneration();
         this.removeGeneratedM2Dups = removeGeneratedM2Dups;
         this.configurationDirectory = configurationDirectory;
         this.strictLicenseCheck = strictLicenseCheck;
         this.buildInfoCollector = buildInfoCollector;
-        this.isTestMode = isTestMode;
+//        this.isTestMode = isTestMode;
     }
 
     public RepositoryData prepare() {
@@ -279,10 +277,10 @@ public class RepoManager extends DeliverableManager<RepoGenerationData, Reposito
 
         ParentPomDownloader.addParentPoms(targetRepoContentsDir.toPath());
 
-        if (!isTestMode) {
+//        if (!isTestMode) {
             RepositoryUtils.removeCommunityArtifacts(targetRepoContentsDir);
             RepositoryUtils.removeIrrelevantFiles(targetRepoContentsDir);
-        }
+//        }
         addMissingSources();
 
         RepositoryUtils.addCheckSums(targetRepoContentsDir);

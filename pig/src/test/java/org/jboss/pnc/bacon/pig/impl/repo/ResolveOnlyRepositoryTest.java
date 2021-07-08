@@ -1,5 +1,6 @@
 package org.jboss.pnc.bacon.pig.impl.repo;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.jboss.pnc.bacon.pig.impl.PigContext;
@@ -11,6 +12,7 @@ import org.jboss.pnc.bacon.pig.impl.config.RepoGenerationStrategy;
 import org.jboss.pnc.bacon.pig.impl.documents.Deliverables;
 import org.jboss.pnc.bacon.pig.impl.pnc.BuildInfoCollector;
 import org.jboss.pnc.bacon.pig.impl.pnc.PncBuild;
+import org.jboss.pnc.bacon.pig.impl.utils.FileUtils;
 import org.jboss.pnc.bacon.pig.impl.utils.ResourceUtils;
 import org.jboss.pnc.bacon.pig.impl.utils.indy.Indy;
 import org.junit.jupiter.api.Test;
@@ -31,13 +33,24 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static org.mockito.Mockito.doReturn;
 
 public class ResolveOnlyRepositoryTest {
 
+    WireMockServer wireMockServer = new WireMockServer();
+
     @Test
     void resolveAndRepackageShouldGenerateRepository() {
 
+        wireMockServer.start();
+        stubFor(
+            get(urlEqualTo("/org/jboss/jboss-parent/37/jboss-parent-37.pom"))
+                .willReturn(aResponse().withBodyFile("sample.pom")));
+        stubFor(
+            get(urlMatching("/io/vertx/vertx-bridge-common/4.1.0/vertx-bridge-common-4.1.0.jar"))
+                .willReturn(aResponse().withBodyFile("sample.jar")));
         mockPigContextAndMethods();
         mockIndySettingsFile();
 
@@ -69,8 +82,7 @@ public class ResolveOnlyRepositoryTest {
                 configurationDirectory,
                 false,
                 false,
-                buildInfoCollectorMock,
-                true);
+                buildInfoCollectorMock);
 
         RepoManager repoManagerSpy = Mockito.spy(repoManager);
 
@@ -89,7 +101,7 @@ public class ResolveOnlyRepositoryTest {
             }
             assert repoZipContents.contains(filePath);
         });
-
+        wireMockServer.stop();
     }
 
     private void mockPigContextAndMethods() {
@@ -102,6 +114,7 @@ public class ResolveOnlyRepositoryTest {
     private void mockIndySettingsFile() {
         String pathToTestSettingsFile = ResourceUtils.extractToTmpFile("/indy-settings.xml", "settings", ".xml")
                 .getAbsolutePath();
+        FileUtils.replaceFileString("https://repo1.maven.org/maven2/","http://localhost:8080/",pathToTestSettingsFile);
         MockedStatic<Indy> indyMockedStatic = Mockito.mockStatic(Indy.class);
         indyMockedStatic.when(() -> Indy.getConfiguredIndySettingsXmlPath(false)).thenReturn(pathToTestSettingsFile);
     }
